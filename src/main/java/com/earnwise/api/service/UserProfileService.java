@@ -42,6 +42,9 @@ public class UserProfileService {
         userProfile.setUsername(user.get().getUsername());
         userProfile.setEmail(user.get().getUsername());
         userProfile.setUserId(user.get().getId());
+        userProfile.setRating(0.0);
+        userProfile.setTotalCalls(0);
+        userProfile.setTotalRatings(0);
         userProfileRepository.save(userProfile);
     }
 
@@ -68,6 +71,18 @@ public class UserProfileService {
         userProfile.setPhoneNumber(updateProfileRequest.getPhoneNumber());
         userProfile.setProfessionalTitle(updateProfileRequest.getProfessionalTitle());
 
+        userProfileRepository.save(userProfile);
+    }
+
+    @Transactional
+    public void updateProfilePic(String userId, String profileUrl) {
+        Optional<UserProfile> profile = userProfileRepository.findByUserId(userId);
+        if(profile.isEmpty()) {
+            throw new NotFoundException("User profile not found");
+        }
+
+        UserProfile userProfile = profile.get();
+        userProfile.setProfilePic(profileUrl);
         userProfileRepository.save(userProfile);
     }
 }

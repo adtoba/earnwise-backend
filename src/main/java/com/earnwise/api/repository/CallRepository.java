@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CallRepository extends JpaRepository<Call, String> {
-    List<Call> findAllByCreatedBy(String createdBy);
+    List<Call> findAllByUserId(String userId);
 }
