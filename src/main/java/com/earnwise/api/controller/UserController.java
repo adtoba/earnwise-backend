@@ -3,6 +3,7 @@ package com.earnwise.api.controller;
 import com.earnwise.api.configuration.security.JwtTokenUtil;
 import com.earnwise.api.domain.dto.AuthRequest;
 import com.earnwise.api.domain.dto.CreateUserRequest;
+import com.earnwise.api.domain.dto.UserView;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.service.UserService;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("auth/register")
-    public User createUser(@RequestBody @Valid CreateUserRequest request) {
+    public UserView createUser(@RequestBody @Valid CreateUserRequest request) {
        return userService.createUser(request);
     }
 
@@ -49,11 +50,11 @@ public class UserController {
 
             return ResponseEntity.ok().body(jwtTokenUtil.generateToken(user));
         } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
         }
     }
 
-    @PostMapping("auth/all")
+    @PostMapping("all")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }

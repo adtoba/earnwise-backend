@@ -11,17 +11,17 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-//    default User getUserById(String id) {
-//        Optional<User> optionalUser = findById(id);
-//        if(optionalUser.isEmpty()) {
-//            throw new NotFoundException("User not found");
-//        }
-//
-//        if(!optionalUser.get().isEnabled()) {
-//            throw new NotFoundException("User not found");
-//        }
-//        return optionalUser.get();
-//    }
+    default User getUserById(String id) {
+        Optional<User> optionalUser = findById(id);
+        if(optionalUser.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+
+        if(!optionalUser.get().isEnabled()) {
+            throw new NotFoundException("User not found");
+        }
+        return optionalUser.get();
+    }
     Optional<User> findByUsername(String username);
 
 }

@@ -16,18 +16,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    private final UserService userDetailsService;
+    @Autowired
+    private UserService userDetailsService;
 
-    private CustomAuthenticationProvider(UserService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         try{
             UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
-            return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),userDetails.getPassword(),userDetails.getAuthorities());
-        } catch (UsernameNotFoundException e){
+            return new UsernamePasswordAuthenticationToken(
+                    userDetails.getUsername(),
+                    userDetails.getPassword(),
+                    userDetails.getAuthorities()
+            );
+        } catch (UsernameNotFoundException e) {
             throw new BadCredentialsException("Invalid Credentials");
         }
     }

@@ -2,6 +2,9 @@ package com.earnwise.api.service;
 
 import com.earnwise.api.domain.dto.CreateUserRequest;
 //import com.earnwise.api.domain.model.Role;
+import com.earnwise.api.domain.dto.UserView;
+import com.earnwise.api.domain.exception.NotFoundException;
+import com.earnwise.api.domain.mapper.UserViewMapper;
 import com.earnwise.api.domain.model.Role;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.repository.RoleRepository;
@@ -10,13 +13,16 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -24,17 +30,19 @@ import static java.lang.String.format;
 @Service
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-
     @Autowired
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    private UserViewMapper userViewMapper;
+
+
+    private final UserRepository userRepository;
+
+
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
     }
 
     @Transactional
-    public User createUser(CreateUserRequest userRequest) {
+    public UserView createUser(CreateUserRequest userRequest) {
         if(userRepository.findByUsername(userRequest.getEmail()).isPresent()) {
             throw new ValidationException("Email already exists");
         }
@@ -51,7 +59,7 @@ public class UserService implements UserDetailsService {
         user.setAuthorities(roles);
 
         userRepository.save(user);
-        return user;
+        return userViewMapper.toUserView(user);
     }
 
     @Transactional
@@ -61,7 +69,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User getUserByEmail(String email) {
-        return userRepository.findByUsername(email).get();
+        Optional<User> user = userRepository.findByUsername(email);
+        if(!user.isPresent()) {
+            throw new BadCredentialsException("User not found");
+        } else {
+            return user.get();
+        }
     }
 
     @Override

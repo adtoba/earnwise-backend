@@ -4,8 +4,11 @@ import com.earnwise.api.domain.model.User;
 import com.earnwise.api.repository.UserRepository;
 import com.earnwise.api.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,24 +32,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private CustomAuthenticationProvider authenticationProvider;
-
-    private final UserService userService;
-    private final UserRepository userRepository;
+    private final CustomAuthenticationProvider authenticationProvider;
     private final JwtTokenFilter jwtTokenFilter;
 
-    public SecurityConfig(UserRepository userRepository,
-                          UserService userService,
-                          JwtTokenFilter jwtTokenFilter) {
+    private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    public SecurityConfig(CustomAuthenticationProvider authenticationProvider,
+                          JwtTokenFilter jwtTokenFilter
+    ) {
         super();
-        this.userService = userService;
-        this.userRepository = userRepository;
+        this.authenticationProvider = authenticationProvider;
         this.jwtTokenFilter = jwtTokenFilter;
 
         // Inherit security context in async function calls
@@ -61,6 +67,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.exceptionHandling((exception) -> exception.authenticationEntryPoint(((request, response, authException) -> {
+            logger.error("Unauthorized request - {}", authException.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
         })));
 
@@ -85,5 +92,15 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
+        return source;
+    }
 }
