@@ -32,6 +32,7 @@ public class UserProfileView {
     private Double rating;
     private Integer totalRatings;
     private Integer totalCalls;
+    private List<String> interests;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

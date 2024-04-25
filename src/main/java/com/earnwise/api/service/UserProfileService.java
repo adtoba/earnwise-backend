@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,7 @@ public class UserProfileService {
         userProfile.setRating(0.0);
         userProfile.setTotalCalls(0);
         userProfile.setTotalRatings(0);
+        userProfile.setInterests(new ArrayList<>());
         userProfileRepository.save(userProfile);
     }
 
@@ -69,6 +71,7 @@ public class UserProfileService {
         userProfile.setTimezone(updateProfileRequest.getTimezone());
         userProfile.setLocation(updateProfileRequest.getLocation());
         userProfile.setPhoneNumber(updateProfileRequest.getPhoneNumber());
+        userProfile.setInterests(updateProfileRequest.getInterests());
         userProfile.setProfessionalTitle(updateProfileRequest.getProfessionalTitle());
 
         userProfileRepository.save(userProfile);

@@ -38,7 +38,8 @@ public class UserProfile implements Serializable {
 
     private boolean isVerified;
 
-    private String interests;
+    @ElementCollection
+    private List<String> interests = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)
