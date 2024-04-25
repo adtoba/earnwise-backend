@@ -8,11 +8,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class CreateCallRequest {
     private String reason;
     private String expertId;
     private String expertProfilePic;
+    private List<String> suggestedTimes;
     private Integer totalMinutes;
 }

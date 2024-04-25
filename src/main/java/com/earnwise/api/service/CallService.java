@@ -44,6 +44,7 @@ public class CallService {
         call.setTotalMinutes(createCallRequest.getTotalMinutes());
         call.setUserProfilePic(profile.get().getProfilePic());
         call.setStatus("pending");
+        call.setSuggestedTimes(createCallRequest.getSuggestedTimes());
         call.setUserId(userId);
         return callRepository.save(call);
     }
