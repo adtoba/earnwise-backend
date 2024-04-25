@@ -1,6 +1,7 @@
 package com.earnwise.api.controller;
 
 import com.earnwise.api.domain.dto.CreateCallRequest;
+import com.earnwise.api.domain.dto.DeclineCallRequest;
 import com.earnwise.api.domain.model.Call;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.service.CallService;
@@ -23,17 +24,27 @@ public class CallController {
     }
 
     @PostMapping
-    public Call createCall(@RequestBody CreateCallRequest createCallRequest) {
+    public ResponseEntity<?> createCall(@RequestBody CreateCallRequest createCallRequest) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return callService.createCall(user.getId(), createCallRequest);
+        Call call = callService.createCall(user.getId(), createCallRequest);
+        return ResponseEntity.ok(call);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("accept/{id}")
     public ResponseEntity<?> acceptCall(@PathVariable String id) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         callService.acceptCall(id);
         Map<String, String> response = new HashMap<>();
         response.put("message", "Call accepted");
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("decline/{id}")
+    public ResponseEntity<?> declineCall(@PathVariable String id, @RequestBody DeclineCallRequest declineCallRequest) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        callService.declineCall(id, declineCallRequest);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Call declined");
         return ResponseEntity.ok(response);
     }
 

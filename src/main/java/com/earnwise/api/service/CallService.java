@@ -1,6 +1,7 @@
 package com.earnwise.api.service;
 
 import com.earnwise.api.domain.dto.CreateCallRequest;
+import com.earnwise.api.domain.dto.DeclineCallRequest;
 import com.earnwise.api.domain.exception.NotFoundException;
 import com.earnwise.api.domain.model.Call;
 import com.earnwise.api.domain.model.User;
@@ -62,6 +63,25 @@ public class CallService {
         Call updatedCall = call.get();
         updatedCall.setStatus("accepted");
         updatedCall.setAcceptedTime(LocalDateTime.now().toString());
+
+        callRepository.save(updatedCall);
+    }
+
+    @Transactional
+    public void declineCall(String id, DeclineCallRequest declineCallRequest) {
+        Optional<Call> call = callRepository.findById(id);
+        if (call.isEmpty()) {
+            throw new NotFoundException("Call not found");
+        }
+
+        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.get().getUserId());
+        if (profile.isEmpty()) {
+            throw new NotFoundException("User profile not found");
+        }
+
+        Call updatedCall = call.get();
+        updatedCall.setStatus("declined");
+        updatedCall.setCancelReason(declineCallRequest.getCancelReason());
 
         callRepository.save(updatedCall);
     }
