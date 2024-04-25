@@ -7,10 +7,12 @@ import com.earnwise.api.domain.model.User;
 import com.earnwise.api.domain.model.UserProfile;
 import com.earnwise.api.repository.CallRepository;
 import com.earnwise.api.repository.UserProfileRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,7 @@ public class CallService {
         this.userProfileRepository = userProfileRepository;
     }
 
+    @Transactional
     public Call createCall(String userId, CreateCallRequest createCallRequest) {
         Optional<UserProfile> profile = userProfileRepository.findByUserId(userId);
         if (profile.isEmpty()) {
@@ -42,6 +45,25 @@ public class CallService {
         call.setStatus("pending");
         call.setUserId(userId);
         return callRepository.save(call);
+    }
+
+    @Transactional
+    public void acceptCall(String id) {
+        Optional<Call> call = callRepository.findById(id);
+        if (call.isEmpty()) {
+            throw new NotFoundException("Call not found");
+        }
+
+        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.get().getUserId());
+        if (profile.isEmpty()) {
+            throw new NotFoundException("User profile not found");
+        }
+
+        Call updatedCall = call.get();
+        updatedCall.setStatus("accepted");
+        updatedCall.setAcceptedTime(LocalDateTime.now().toString());
+
+        callRepository.save(updatedCall);
     }
 
     public List<Call> getUserCalls(String userId) {
