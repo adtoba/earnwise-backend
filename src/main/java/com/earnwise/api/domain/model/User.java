@@ -3,6 +3,7 @@ package com.earnwise.api.domain.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,14 +14,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Table(name = "users")
+@Entity(name = "users")
 @Data
 public class User implements UserDetails, Serializable {
     @Id
-    @GenericGenerator(name = "uuid2")
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
-    @Column(length = 36, nullable = false, updatable = false)
-    private UUID id;
+    @UuidGenerator
+    private String id;
 
     private String username;
     private String password;
@@ -28,7 +27,9 @@ public class User implements UserDetails, Serializable {
     private String fullName;
 
     private boolean enabled;
-    private Set<Role> authorities = new HashSet<Role>();
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Role> authorities = new HashSet<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -46,6 +47,7 @@ public class User implements UserDetails, Serializable {
         this.password = password;
         this.enabled = true;
     }
+
     @Override
     public boolean isAccountNonExpired() {
         return enabled;
