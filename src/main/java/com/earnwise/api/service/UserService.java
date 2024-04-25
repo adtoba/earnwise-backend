@@ -2,11 +2,13 @@ package com.earnwise.api.service;
 
 import com.earnwise.api.domain.dto.CreateUserRequest;
 //import com.earnwise.api.domain.model.Role;
+import com.earnwise.api.domain.dto.UserProfileView;
 import com.earnwise.api.domain.dto.UserView;
 import com.earnwise.api.domain.exception.NotFoundException;
 import com.earnwise.api.domain.mapper.UserViewMapper;
 import com.earnwise.api.domain.model.Role;
 import com.earnwise.api.domain.model.User;
+import com.earnwise.api.domain.model.UserProfile;
 import com.earnwise.api.repository.RoleRepository;
 import com.earnwise.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -30,15 +32,16 @@ import static java.lang.String.format;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserViewMapper userViewMapper;
-
-
+    private final UserViewMapper userViewMapper;
     private final UserRepository userRepository;
+    private final UserProfileService userProfileService;
 
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserViewMapper userViewMapper,
+                       UserProfileService userProfileService) {
         this.userRepository = userRepository;
+        this.userViewMapper = userViewMapper;
+        this.userProfileService = userProfileService;
     }
 
     @Transactional
@@ -59,6 +62,8 @@ public class UserService implements UserDetailsService {
         user.setAuthorities(roles);
 
         userRepository.save(user);
+
+        userProfileService.create(userRequest.getEmail());
         return userViewMapper.toUserView(user);
     }
 
@@ -70,7 +75,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public User getUserByEmail(String email) {
         Optional<User> user = userRepository.findByUsername(email);
-        if(!user.isPresent()) {
+        if(user.isEmpty()) {
             throw new BadCredentialsException("User not found");
         } else {
             return user.get();

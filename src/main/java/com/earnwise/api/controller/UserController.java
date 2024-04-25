@@ -3,8 +3,11 @@ package com.earnwise.api.controller;
 import com.earnwise.api.configuration.security.JwtTokenUtil;
 import com.earnwise.api.domain.dto.AuthRequest;
 import com.earnwise.api.domain.dto.CreateUserRequest;
+import com.earnwise.api.domain.dto.UserProfileView;
 import com.earnwise.api.domain.dto.UserView;
 import com.earnwise.api.domain.model.User;
+import com.earnwise.api.domain.model.UserProfile;
+import com.earnwise.api.service.UserProfileService;
 import com.earnwise.api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +29,14 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final UserProfileService userProfileService;
 
     @Autowired
-    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserProfileService userProfileService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.userProfileService = userProfileService;
     }
 
     @PostMapping("auth/register")
@@ -53,10 +58,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
         }
     }
-
-    @PostMapping("all")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
 }

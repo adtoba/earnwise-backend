@@ -1,5 +1,6 @@
 package com.earnwise.api.domain.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

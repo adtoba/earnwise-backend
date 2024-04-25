@@ -1,31 +1,28 @@
-package com.earnwise.api.domain.model;
+package com.earnwise.api.domain.dto;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-
-@Entity(name = "user_profile")
 @Data
-public class UserProfile implements Serializable {
-    @Id
-    @UuidGenerator
+public class UserProfileView {
     private String id;
-
     private String fullName;
     private String username;
     private String profilePic;
-    private String userId;
+    private boolean isVerified;
     private String professionalTitle;
     private String email;
     private String bio;
@@ -35,15 +32,6 @@ public class UserProfile implements Serializable {
     private Double rating;
     private Integer totalRatings;
     private Integer totalCalls;
-
-    private boolean isVerified;
-
-    private String interests;
-
-    @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }
