@@ -1,5 +1,6 @@
 package com.earnwise.api.service;
 
+import com.earnwise.api.configuration.security.PasswordUtil;
 import com.earnwise.api.domain.dto.CreateUserRequest;
 //import com.earnwise.api.domain.model.Role;
 import com.earnwise.api.domain.dto.UserProfileView;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +37,15 @@ public class UserService implements UserDetailsService {
     private final UserViewMapper userViewMapper;
     private final UserRepository userRepository;
     private final UserProfileService userProfileService;
+    private final PasswordUtil passwordUtil;
 
-
-    public UserService(UserRepository userRepository, UserViewMapper userViewMapper,
+    public UserService(UserRepository userRepository,
+                       UserViewMapper userViewMapper,
+                       PasswordUtil passwordUtil,
                        UserProfileService userProfileService) {
         this.userRepository = userRepository;
         this.userViewMapper = userViewMapper;
+        this.passwordUtil = passwordUtil;
         this.userProfileService = userProfileService;
     }
 
@@ -57,7 +62,7 @@ public class UserService implements UserDetailsService {
 
         User user = new User();
         user.setFullName(userRequest.getFullName());
-        user.setPassword(userRequest.getPassword());
+        user.setPassword(passwordUtil.encode(userRequest.getPassword()));
         user.setUsername(userRequest.getEmail());
         user.setAuthorities(roles);
 
@@ -67,10 +72,12 @@ public class UserService implements UserDetailsService {
         return userViewMapper.toUserView(user);
     }
 
+
     @Transactional
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
 
     @Transactional
     public User getUserByEmail(String email) {

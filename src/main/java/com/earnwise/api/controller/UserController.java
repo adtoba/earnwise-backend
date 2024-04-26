@@ -1,6 +1,7 @@
 package com.earnwise.api.controller;
 
 import com.earnwise.api.configuration.security.JwtTokenUtil;
+import com.earnwise.api.configuration.security.PasswordUtil;
 import com.earnwise.api.domain.dto.AuthRequest;
 import com.earnwise.api.domain.dto.CreateUserRequest;
 import com.earnwise.api.domain.dto.UserProfileView;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -33,16 +35,19 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserViewMapper userViewMapper;
+    private final PasswordUtil passwordUtil;
 
     @Autowired
     public UserController(UserService userService,
                           AuthenticationManager authenticationManager,
                           JwtTokenUtil jwtTokenUtil,
-                          UserViewMapper userViewMapper) {
+                          UserViewMapper userViewMapper,
+                          PasswordUtil passwordUtil) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userViewMapper = userViewMapper;
+        this.passwordUtil = passwordUtil;
     }
 
     @PostMapping("auth/register")
@@ -58,6 +63,11 @@ public class UserController {
             );
 
             final User user = userService.getUserByEmail(authenticate.getPrincipal().toString());
+
+            if(!passwordUtil.matches(request.getPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Invalid email or password");
+            }
+
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtTokenUtil.generateToken(user));
             response.put("user", userViewMapper.toUserView(user));
