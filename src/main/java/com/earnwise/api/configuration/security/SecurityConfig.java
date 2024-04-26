@@ -1,6 +1,7 @@
 package com.earnwise.api.configuration.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,15 +33,24 @@ import static java.lang.String.format;
 public class SecurityConfig {
 
     private final CustomAuthenticationProvider authenticationProvider;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtTokenFilter jwtTokenFilter;
+
+
+    @Value("${springdoc.api-docs.path}")
+    private String restApiDocPath;
+    @Value("${springdoc.swagger-ui.path}")
+    private String swaggerPath;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
 
     public SecurityConfig(CustomAuthenticationProvider authenticationProvider,
+                          CustomAuthenticationEntryPoint authenticationEntryPoint,
                           JwtTokenFilter jwtTokenFilter
     ) {
         super();
+        this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationProvider = authenticationProvider;
         this.jwtTokenFilter = jwtTokenFilter;
 
@@ -55,15 +65,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.exceptionHandling((exception) -> exception.authenticationEntryPoint(((request, response, authException) -> {
-            logger.error("Unauthorized request - {}", authException.getMessage());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
-        })));
+        http.exceptionHandling((exception) -> exception.authenticationEntryPoint(
+                authenticationEntryPoint
+        ));
 
         http.cors(Customizer.withDefaults())
                         .csrf(AbstractHttpConfigurer::disable);
 
-        http.authorizeHttpRequests((auth) -> auth.requestMatchers("api/v1/auth/**").permitAll()
+        http.authorizeHttpRequests((auth) ->
+                auth.requestMatchers("/").permitAll()
+                .requestMatchers(format("%s/**", restApiDocPath)).permitAll()
+                .requestMatchers(format("%s/**", swaggerPath)).permitAll()
+
+                .requestMatchers("api/v1/auth/**").permitAll()
                 .anyRequest().authenticated());
 
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -85,7 +99,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

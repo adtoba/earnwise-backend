@@ -30,6 +30,7 @@ public class Call {
     private String acceptedTime;
     private String cancelReason;
     private Integer totalMinutes;
+    private Double hourlyRate;
     private boolean isPaid;
 
     @ElementCollection

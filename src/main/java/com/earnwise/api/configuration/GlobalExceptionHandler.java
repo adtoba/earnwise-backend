@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.NOT_FOUND.value(), ex.getMessage(), List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(BadRequestException.class)
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(new ApiCallError<>("Missing request parameter", List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.BAD_REQUEST.value(), "Missing request parameter", List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(new ApiCallError<>("Method argument type mismatch", List.of(details)));
+                .body(new ApiCallError<>(HttpStatus.BAD_REQUEST.value(), "Method argument type mismatch", List.of(details)));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(new ApiCallError<>("Method argument validation failed", details));
+                .body(new ApiCallError<>(HttpStatus.BAD_REQUEST.value(), "Method argument validation failed", details));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -107,7 +107,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new ApiCallError<>("Access denied!", List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.FORBIDDEN.value(), "Access denied!", List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(Exception.class)
@@ -116,11 +116,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiCallError<>("Internal server error", List.of(ex.getMessage())));
+                .body(new ApiCallError<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", List.of(ex.getMessage())));
     }
 
     @Data @NoArgsConstructor @AllArgsConstructor
     public static class ApiCallError<T> {
+        private int status;
         private String message;
         private List<T> details;
 

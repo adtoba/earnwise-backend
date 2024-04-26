@@ -41,6 +41,7 @@ public class CallService {
         call.setExpertId(createCallRequest.getExpertId());
         call.setExpertProfilePic(createCallRequest.getExpertProfilePic());
         call.setPaid(false);
+        call.setHourlyRate(createCallRequest.getHourlyRate());
         call.setTotalMinutes(createCallRequest.getTotalMinutes());
         call.setUserProfilePic(profile.get().getProfilePic());
         call.setStatus("pending");

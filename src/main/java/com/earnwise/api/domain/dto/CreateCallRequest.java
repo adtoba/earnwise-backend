@@ -15,6 +15,7 @@ public class CreateCallRequest {
     private String reason;
     private String expertId;
     private String expertProfilePic;
+    private Double hourlyRate;
     private List<String> suggestedTimes;
     private Integer totalMinutes;
 }

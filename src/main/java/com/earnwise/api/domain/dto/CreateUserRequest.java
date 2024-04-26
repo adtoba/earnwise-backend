@@ -9,5 +9,4 @@ public class CreateUserRequest {
     private String fullName;
     private String email;
     private String password;
-    private Set<String> authorities;
 }
