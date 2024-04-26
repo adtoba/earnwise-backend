@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "expert_profile")
+@Entity
 @Data
 public class ExpertProfile {
     @Id

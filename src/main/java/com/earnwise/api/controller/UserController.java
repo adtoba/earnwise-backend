@@ -58,11 +58,8 @@ public class UserController {
     @PostMapping("auth/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         try {
-            Authentication authenticate = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
 
-            final User user = userService.getUserByEmail(authenticate.getPrincipal().toString());
+            final User user = userService.getUserByEmail(request.getEmail());
 
             if(!passwordUtil.matches(request.getPassword(), user.getPassword())) {
                 throw new BadCredentialsException("Invalid email or password");
