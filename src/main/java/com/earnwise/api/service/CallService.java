@@ -2,6 +2,7 @@ package com.earnwise.api.service;
 
 import com.earnwise.api.domain.dto.CreateCallRequest;
 import com.earnwise.api.domain.dto.DeclineCallRequest;
+import com.earnwise.api.domain.exception.BadRequestException;
 import com.earnwise.api.domain.exception.NotFoundException;
 import com.earnwise.api.domain.model.Call;
 import com.earnwise.api.domain.model.User;
@@ -28,7 +29,6 @@ public class CallService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    @Transactional
     public Call createCall(String userId, CreateCallRequest createCallRequest) {
         Optional<UserProfile> profile = userProfileRepository.findByUserId(userId);
         if (profile.isEmpty()) {
@@ -46,45 +46,51 @@ public class CallService {
         call.setStatus("pending");
         call.setSuggestedTimes(createCallRequest.getSuggestedTimes());
         call.setUserId(userId);
+
+
         return callRepository.save(call);
     }
 
     @Transactional
     public void acceptCall(String id) {
-        Optional<Call> call = callRepository.findById(id);
-        if (call.isEmpty()) {
-            throw new NotFoundException("Call not found");
+        Call call = getCallById(id);
+
+        if(call.getStatus().equals("accepted")) {
+            throw new BadRequestException("Call has already been accepted");
         }
 
-        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.get().getUserId());
+        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.getUserId());
         if (profile.isEmpty()) {
             throw new NotFoundException("User profile not found");
         }
 
-        Call updatedCall = call.get();
-        updatedCall.setStatus("accepted");
-        updatedCall.setAcceptedTime(LocalDateTime.now().toString());
-
-        callRepository.save(updatedCall);
+        call.setStatus("accepted");
+        call.setAcceptedTime(LocalDateTime.now().toString());
     }
 
     @Transactional
     public void declineCall(String id, DeclineCallRequest declineCallRequest) {
-        Optional<Call> call = callRepository.findById(id);
-        if (call.isEmpty()) {
-            throw new NotFoundException("Call not found");
+        Call call = getCallById(id);
+
+        if(call.getStatus().equals("declined")) {
+            throw new BadRequestException("Call has already been declined");
         }
 
-        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.get().getUserId());
+        Optional<UserProfile> profile = userProfileRepository.findByUserId(call.getUserId());
         if (profile.isEmpty()) {
             throw new NotFoundException("User profile not found");
         }
+        call.setStatus("declined");
+        call.setCancelReason(declineCallRequest.getCancelReason());
+    }
 
-        Call updatedCall = call.get();
-        updatedCall.setStatus("declined");
-        updatedCall.setCancelReason(declineCallRequest.getCancelReason());
+    public Call getCallById(String id) {
+        Optional<Call> result = callRepository.findById(id);
+        if(result.isEmpty()) {
+            throw new NotFoundException("Call not found");
+        }
 
-        callRepository.save(updatedCall);
+        return result.get();
     }
 
     public List<Call> getUserCalls(String userId) {

@@ -34,7 +34,8 @@ public class CallController {
     public ResponseEntity<?> acceptCall(@PathVariable String id) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         callService.acceptCall(id);
-        Map<String, String> response = new HashMap<>();
+
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "Call accepted");
         return ResponseEntity.ok(response);
     }

@@ -1,5 +1,6 @@
 package com.earnwise.api.configuration;
 
+import com.earnwise.api.domain.exception.BadRequestException;
 import com.earnwise.api.domain.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
@@ -35,7 +36,16 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ApiCallError<>("Not found exception", List.of(ex.getMessage())));
+                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiCallError<String>> handleBadRequestException(HttpServletRequest request, BadRequestException ex) {
+        logger.error("BadRequestException {}\n", request.getRequestURI(), ex);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -44,7 +54,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(new ApiCallError<>("Validation exception", List.of(ex.getMessage())));
+                .body(new ApiCallError<>(ex.getMessage(), List.of(ex.getMessage())));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -111,7 +121,6 @@ public class GlobalExceptionHandler {
 
     @Data @NoArgsConstructor @AllArgsConstructor
     public static class ApiCallError<T> {
-
         private String message;
         private List<T> details;
 

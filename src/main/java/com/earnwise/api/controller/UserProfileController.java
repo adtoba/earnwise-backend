@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/profile")
 public class UserProfileController {
 
-    private UserProfileService userProfileService;
+    private final UserProfileService userProfileService;
 
     public UserProfileController(UserProfileService userProfileService) {
         this.userProfileService = userProfileService;
@@ -23,6 +23,11 @@ public class UserProfileController {
                 .getPrincipal();
 
         return userProfileService.getUserProfile(user.getId());
+    }
+
+    @GetMapping("{id}")
+    public UserProfileView getUserProfileById(@PathVariable String id) {
+        return userProfileService.getUserProfile(id);
     }
 
     @PutMapping
