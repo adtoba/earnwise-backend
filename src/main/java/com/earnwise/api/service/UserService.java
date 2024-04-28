@@ -1,6 +1,7 @@
 package com.earnwise.api.service;
 
 import com.earnwise.api.configuration.security.PasswordUtil;
+import com.earnwise.api.domain.dto.CreateSocialRequest;
 import com.earnwise.api.domain.dto.CreateUserRequest;
 //import com.earnwise.api.domain.model.Role;
 import com.earnwise.api.domain.dto.UserProfileView;
@@ -11,6 +12,7 @@ import com.earnwise.api.domain.model.Role;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.domain.model.UserProfile;
 import com.earnwise.api.repository.RoleRepository;
+import com.earnwise.api.repository.SocialsRepository;
 import com.earnwise.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
@@ -36,17 +38,20 @@ public class UserService implements UserDetailsService {
 
     private final UserViewMapper userViewMapper;
     private final UserRepository userRepository;
+    private final SocialsService socialsService;
     private final UserProfileService userProfileService;
     private final PasswordUtil passwordUtil;
 
     public UserService(UserRepository userRepository,
                        UserViewMapper userViewMapper,
                        PasswordUtil passwordUtil,
+                       SocialsService socialsService,
                        UserProfileService userProfileService) {
         this.userRepository = userRepository;
         this.userViewMapper = userViewMapper;
         this.passwordUtil = passwordUtil;
         this.userProfileService = userProfileService;
+        this.socialsService = socialsService;
     }
 
     @Transactional
@@ -68,7 +73,16 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
 
+        // Create user profile for new account
         userProfileService.create(userRequest.getEmail());
+
+        // Create a social profile for new account
+        CreateSocialRequest request = new CreateSocialRequest();
+        request.setInstagram(null);
+        request.setTwitter(null);
+        request.setLinkedIn(null);
+        socialsService.create(request);
+
         return userViewMapper.toUserView(user);
     }
 

@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "api/v1")
+@RequestMapping(path = "api/v1/user")
 public class UserController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserViewMapper userViewMapper;
     private final PasswordUtil passwordUtil;
@@ -44,18 +43,17 @@ public class UserController {
                           UserViewMapper userViewMapper,
                           PasswordUtil passwordUtil) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userViewMapper = userViewMapper;
         this.passwordUtil = passwordUtil;
     }
 
-    @PostMapping("auth/register")
+    @PostMapping("register")
     public UserView createUser(@RequestBody @Valid CreateUserRequest request) {
        return userService.createUser(request);
     }
 
-    @PostMapping("auth/login")
+    @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         try {
 

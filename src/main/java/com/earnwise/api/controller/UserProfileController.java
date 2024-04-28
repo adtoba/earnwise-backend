@@ -25,9 +25,9 @@ public class UserProfileController {
         return userProfileService.getUserProfile(user.getId());
     }
 
-    @GetMapping("{id}")
-    public UserProfileView getUserProfileById(@PathVariable String id) {
-        return userProfileService.getUserProfile(id);
+    @GetMapping("{user_id}")
+    public UserProfileView getUserProfileByUserId(@PathVariable String user_id) {
+        return userProfileService.getUserProfile(user_id);
     }
 
     @PutMapping

@@ -32,8 +32,8 @@ public class ExpertProfileController {
         return ResponseEntity.ok(expertProfile);
     }
 
-    @GetMapping
-    public ResponseEntity<?> getExpertProfileByUserId(@RequestParam("userId") String userId) {
+    @GetMapping()
+    public ResponseEntity<?> getExpertProfileByUserId(@RequestParam("user_id") String userId) {
         ExpertProfile expertProfile = expertProfileService.getExpertProfileByUserId(userId);
         return ResponseEntity.ok(expertProfile);
     }
@@ -44,9 +44,9 @@ public class ExpertProfileController {
         return ResponseEntity.ok(expertProfile);
     }
 
-    @PostMapping("topics")
-    public ResponseEntity<?> getExpertByTopics(@RequestBody GetExpertRequest request) {
-        List<ExpertProfile> expertProfiles = expertProfileService.getExpertProfileByTopics(request.getTopics());
+    @GetMapping("topics")
+    public ResponseEntity<?> getExpertByTopics(@RequestParam(name = "topics", required = true) List<String> topics) {
+        List<ExpertProfile> expertProfiles = expertProfileService.getExpertProfileByTopics(topics);
         return ResponseEntity.ok(expertProfiles);
     }
 

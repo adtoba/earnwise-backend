@@ -1,10 +1,13 @@
 package com.earnwise.api.controller;
 
+import com.earnwise.api.domain.dto.AcceptCallRequest;
 import com.earnwise.api.domain.dto.CreateCallRequest;
 import com.earnwise.api.domain.dto.DeclineCallRequest;
+import com.earnwise.api.domain.dto.PushNotificationRequest;
 import com.earnwise.api.domain.model.Call;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.service.CallService;
+import com.earnwise.api.service.NotificationService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,9 +24,11 @@ import java.util.Map;
 public class CallController {
 
     private final CallService callService;
+    private final NotificationService notificationService;
 
-    public CallController(CallService callService) {
+    public CallController(CallService callService, NotificationService notificationService) {
         this.callService = callService;
+        this.notificationService = notificationService;
     }
 
     @PostMapping
@@ -33,20 +38,26 @@ public class CallController {
         return ResponseEntity.ok(call);
     }
 
-    @PutMapping("accept/{id}")
-    public ResponseEntity<?> acceptCall(@PathVariable String id) {
+    @PutMapping("accept")
+    public ResponseEntity<?> acceptCall(@RequestBody AcceptCallRequest acceptCallRequest) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        callService.acceptCall(id);
+        callService.acceptCall(acceptCallRequest.getId());
+
+        PushNotificationRequest request = new PushNotificationRequest();
+        request.setTitle("EarnWise");
+        request.setDesc("Your call request was accepted");
+        request.setUserId(user.getId());
+        notificationService.sendPushNotification(request);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Call accepted");
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("decline/{id}")
-    public ResponseEntity<?> declineCall(@PathVariable String id, @RequestBody DeclineCallRequest declineCallRequest) {
+    @PutMapping("decline")
+    public ResponseEntity<?> declineCall(@RequestBody DeclineCallRequest declineCallRequest) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        callService.declineCall(id, declineCallRequest);
+        callService.declineCall(declineCallRequest.getId(), declineCallRequest);
         Map<String, String> response = new HashMap<>();
         response.put("message", "Call declined");
         return ResponseEntity.ok(response);
