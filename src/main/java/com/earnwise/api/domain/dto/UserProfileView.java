@@ -1,5 +1,6 @@
 package com.earnwise.api.domain.dto;
 
+import com.earnwise.api.domain.model.ExpertProfile;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,7 @@ public class UserProfileView {
     private Integer totalRatings;
     private Integer totalCalls;
     private List<String> interests;
+    private ExpertProfile expertProfile;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

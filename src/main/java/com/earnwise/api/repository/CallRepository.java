@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CallRepository extends JpaRepository<Call, String> {
     List<Call> findAllByUserId(String userId);
+    List<Call> findAllByStatusAndUserId(String status, String userId);
 }

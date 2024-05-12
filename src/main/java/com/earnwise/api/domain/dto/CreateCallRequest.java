@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class CreateCallRequest {
     private String reason;
+    private String expertName;
     private String expertId;
     private String expertProfilePic;
     private Double hourlyRate;

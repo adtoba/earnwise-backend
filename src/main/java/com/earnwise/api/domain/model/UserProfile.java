@@ -1,5 +1,6 @@
 package com.earnwise.api.domain.model;
 
+import com.earnwise.api.domain.dto.ExpertProfileView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +41,7 @@ public class UserProfile implements Serializable {
 
     @ElementCollection
     private List<String> interests = new ArrayList<>();
-
+    
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

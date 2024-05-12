@@ -37,7 +37,9 @@ public class CallService {
 
         Call call = new Call();
         call.setReason(createCallRequest.getReason());
+        call.setUserName(profile.get().getFullName());
         call.setUserId(profile.get().getId());
+        call.setExpertName(createCallRequest.getExpertName());
         call.setExpertId(createCallRequest.getExpertId());
         call.setExpertProfilePic(createCallRequest.getExpertProfilePic());
         call.setPaid(false);
@@ -92,6 +94,23 @@ public class CallService {
         }
 
         return result.get();
+    }
+
+
+    public List<Call> getSentRequestCalls(String userId) {
+        return callRepository.findAllByStatusAndUserId("pending", userId);
+    }
+
+    public List<Call> getActiveCalls(String userId) {
+        return callRepository.findAllByStatusAndUserId("accepted", userId);
+    }
+
+    public List<Call> getPastCalls(String userId) {
+        return callRepository.findAllByStatusAndUserId("completed", userId);
+    }
+
+    public List<Call> getRequestCalls(String userId) {
+        return callRepository.findAllByStatusAndUserId("completed", userId);
     }
 
     public List<Call> getUserCalls(String userId) {

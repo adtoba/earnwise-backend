@@ -28,9 +28,8 @@ public class SocialsService {
 
     @Transactional
     public SocialsView create(CreateSocialRequest request) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<Socials> optionalSocials = socialsRepository.findByUserId(user.getId());
+        Optional<Socials> optionalSocials = socialsRepository.findByUserId(request.getUserId());
         if (optionalSocials.isPresent()) {
             throw new BadRequestException("Social already exists");
         }

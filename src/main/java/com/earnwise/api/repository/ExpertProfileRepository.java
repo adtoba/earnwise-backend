@@ -14,6 +14,8 @@ public interface ExpertProfileRepository extends JpaRepository<ExpertProfile, St
     Optional<ExpertProfile> findByCategory(String category);
     Optional<ExpertProfile> findByUserId(String userId);
 
+    List<ExpertProfile> findAllByCategory(String category);
+
     @Query("SELECT e FROM ExpertProfile e WHERE EXISTS (SELECT s FROM e.topics s WHERE s IN :topics)")
     List<ExpertProfile> findByTopics(List<String> topics);
 }

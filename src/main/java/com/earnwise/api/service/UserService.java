@@ -71,13 +71,14 @@ public class UserService implements UserDetailsService {
         user.setUsername(userRequest.getEmail());
         user.setAuthorities(roles);
 
-        userRepository.save(user);
+        User result = userRepository.save(user);
 
         // Create user profile for new account
         userProfileService.create(userRequest.getEmail());
 
         // Create a social profile for new account
         CreateSocialRequest request = new CreateSocialRequest();
+        request.setUserId(result.getId());
         request.setInstagram(null);
         request.setTwitter(null);
         request.setLinkedIn(null);

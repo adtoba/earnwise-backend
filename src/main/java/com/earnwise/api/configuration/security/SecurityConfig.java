@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .requestMatchers(format("%s/**", restApiDocPath)).permitAll()
                 .requestMatchers(format("%s/**", swaggerPath)).permitAll()
 
-                .requestMatchers("api/v1/auth/**").permitAll()
+                .requestMatchers("api/v1/user/**").permitAll()
                 .anyRequest().authenticated());
 
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

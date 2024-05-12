@@ -33,16 +33,22 @@ public class ExpertProfileService {
             throw new BadRequestException("Expert profile already exists");
         }
 
+        ExpertProfile expertProfile = getExpertProfile(request, user);
+
+        return expertProfileRepository.save(expertProfile);
+    }
+
+    private static ExpertProfile getExpertProfile(CreateExpertProfileRequest request, User user) {
         ExpertProfile expertProfile = new ExpertProfile();
         expertProfile.setTitle(request.getTitle());
         expertProfile.setDescription(request.getDescription());
         expertProfile.setCategory(request.getCategory());
         expertProfile.setUserId(user.getId());
+        expertProfile.setFullName(user.getFullName());
         expertProfile.setTopics(request.getTopics());
         expertProfile.setCoverImage(request.getCoverImage());
         expertProfile.setHourlyRate(request.getHourlyRate());
-
-        return expertProfileRepository.save(expertProfile);
+        return expertProfile;
     }
 
     public ExpertProfile getExpertProfileById(String id) {
@@ -56,20 +62,20 @@ public class ExpertProfileService {
     public ExpertProfile getExpertProfileByUserId(String userId) {
         Optional<ExpertProfile> expertProfileOptional = expertProfileRepository.findByUserId(userId);
         if(expertProfileOptional.isEmpty()) {
-            throw new NotFoundException("Expert profile not found");
+            throw new NotFoundException("Expert profile not found here");
         }
         return expertProfileOptional.get();
     }
 
-    public ExpertProfile getExpertProfileByCategory(String category) {
-        Optional<ExpertProfile> expertProfileOptional = expertProfileRepository.findByCategory(category);
-        if(expertProfileOptional.isEmpty()) {
-            throw new NotFoundException("Expert profile not found");
-        }
-        return expertProfileOptional.get();
+    public List<ExpertProfile> getAllExpertProfileByCategory(String category) {
+        return expertProfileRepository.findAllByCategory(category);
     }
 
-    public List<ExpertProfile> getExpertProfileByTopics(List<String> topics) {
+    public List<ExpertProfile> getAllExpertProfileByTopics(List<String> topics) {
         return expertProfileRepository.findByTopics(topics);
+    }
+
+    public List<ExpertProfile> getAllExperts() {
+        return expertProfileRepository.findAll();
     }
 }

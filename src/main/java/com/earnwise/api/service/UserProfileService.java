@@ -4,8 +4,10 @@ import com.earnwise.api.domain.dto.UpdateProfileRequest;
 import com.earnwise.api.domain.dto.UserProfileView;
 import com.earnwise.api.domain.exception.NotFoundException;
 import com.earnwise.api.domain.mapper.UserProfileViewMapper;
+import com.earnwise.api.domain.model.ExpertProfile;
 import com.earnwise.api.domain.model.User;
 import com.earnwise.api.domain.model.UserProfile;
+import com.earnwise.api.repository.ExpertProfileRepository;
 import com.earnwise.api.repository.UserProfileRepository;
 import com.earnwise.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -22,12 +24,16 @@ public class UserProfileService {
     private final UserProfileViewMapper userProfileViewMapper;
     private final UserProfileRepository userProfileRepository;
     private final UserRepository userRepository;
+    private final ExpertProfileRepository expertProfileRepository;
 
-    public UserProfileService(UserProfileViewMapper userProfileViewMapper, UserProfileRepository userProfileRepository,
+    public UserProfileService(UserProfileViewMapper userProfileViewMapper,
+                              UserProfileRepository userProfileRepository,
+                              ExpertProfileRepository expertProfileRepository,
                               UserRepository userRepository) {
         this.userProfileViewMapper = userProfileViewMapper;
         this.userProfileRepository = userProfileRepository;
         this.userRepository = userRepository;
+        this.expertProfileRepository = expertProfileRepository;
     }
 
     @Transactional
@@ -56,7 +62,14 @@ public class UserProfileService {
         if(profile.isEmpty()) {
             throw new NotFoundException("User not found");
         }
-        return userProfileViewMapper.toUserProfileView(profile.get());
+        UserProfileView userProfileView = userProfileViewMapper.toUserProfileView(profile.get());
+        Optional<ExpertProfile> expertProfileOptional = expertProfileRepository.findByUserId(userId);
+        if(expertProfileOptional.isEmpty()) {
+            userProfileView.setExpertProfile(null);
+        } else {
+            userProfileView.setExpertProfile(expertProfileOptional.get());
+        }
+        return userProfileView;
     }
 
     @Transactional
