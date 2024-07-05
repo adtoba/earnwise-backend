@@ -67,6 +67,10 @@ public class ExpertProfileService {
         return expertProfileOptional.get();
     }
 
+    public Optional<ExpertProfile> getOptionalExpertProfileByUserId(String userId) {
+        return  expertProfileRepository.findByUserId(userId);    
+    }
+
     public List<ExpertProfile> getAllExpertProfileByCategory(String category) {
         return expertProfileRepository.findAllByCategory(category);
     }

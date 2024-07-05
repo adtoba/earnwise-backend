@@ -10,7 +10,6 @@ import com.earnwise.api.domain.model.UserProfile;
 import com.earnwise.api.repository.CallRepository;
 import com.earnwise.api.repository.UserProfileRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +54,7 @@ public class CallService {
     }
 
     @Transactional
-    public void acceptCall(String id) {
+    public void acceptCall(String id, String acceptedTime) {
         Call call = getCallById(id);
 
         if(call.getStatus().equals("accepted")) {
@@ -68,7 +67,7 @@ public class CallService {
         }
 
         call.setStatus("accepted");
-        call.setAcceptedTime(LocalDateTime.now().toString());
+        call.setAcceptedTime(acceptedTime);
     }
 
     @Transactional
@@ -109,11 +108,11 @@ public class CallService {
         return callRepository.findAllByStatusAndUserId("completed", userId);
     }
 
-    public List<Call> getRequestCalls(String userId) {
-        return callRepository.findAllByStatusAndUserId("completed", userId);
+    public List<Call> getRequestCalls(String expertId) {
+        return callRepository.findAllByStatusAndExpertId("pending", expertId);
     }
 
-    public List<Call> getUserCalls(String userId) {
-        return callRepository.findAllByUserId(userId);
+    public List<Call> getUserCalls(String userId, String expertId) {
+        return callRepository.findByUserIdOrExpertIdCustom(userId, expertId);
     }
 }

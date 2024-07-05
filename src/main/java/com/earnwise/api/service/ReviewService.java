@@ -86,10 +86,12 @@ public class ReviewService {
         double sum = 0;
         for(Review review : reviews) {
             sum += review.getRating();
+            System.out.println(sum);
         }
         if(reviews.isEmpty()) {
             return 0.0;
         } else {
+            System.out.println(sum/reviews.size());
             return sum / reviews.size();
         }
     }

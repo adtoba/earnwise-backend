@@ -4,27 +4,19 @@ import com.earnwise.api.configuration.security.JwtTokenUtil;
 import com.earnwise.api.configuration.security.PasswordUtil;
 import com.earnwise.api.domain.dto.AuthRequest;
 import com.earnwise.api.domain.dto.CreateUserRequest;
-import com.earnwise.api.domain.dto.UserProfileView;
 import com.earnwise.api.domain.dto.UserView;
 import com.earnwise.api.domain.mapper.UserViewMapper;
 import com.earnwise.api.domain.model.User;
-import com.earnwise.api.domain.model.UserProfile;
-import com.earnwise.api.service.UserProfileService;
 import com.earnwise.api.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,7 +28,6 @@ public class UserController {
     private final UserViewMapper userViewMapper;
     private final PasswordUtil passwordUtil;
 
-    @Autowired
     public UserController(UserService userService,
                           AuthenticationManager authenticationManager,
                           JwtTokenUtil jwtTokenUtil,

@@ -68,7 +68,7 @@ public class ExpertProfileController {
         return ResponseEntity.ok(expertProfile);
     }
 
-    @GetMapping("suggested")
+    @GetMapping("explore")
     public ResponseEntity<?> getSuggestedExperts() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserProfileView profile = userProfileService.getUserProfile(user.getId());
